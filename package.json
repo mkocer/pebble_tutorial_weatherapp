@@ -1,0 +1,32 @@
+{
+    "author": "pebble@koceri.net",
+    "dependencies": {},
+    "keywords": [],
+    "name": "weather-app",
+    "pebble": {
+        "displayName": "Weather App",
+        "enableMultiJS": true,
+        "messageKeys": [],
+        "projectType": "native",
+        "resources": {
+            "media": [
+                {
+                    "file": "images/weather.png",
+                    "name": "IMAGE_SPLASH",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                }
+            ]
+        },
+        "sdkVersion": "3",
+        "targetPlatforms": [
+            "aplite",
+            "basalt"
+        ],
+        "uuid": "65e5f48c-e870-475a-bd63-8ce8c5553c7a",
+        "watchapp": {
+            "watchface": false
+        }
+    },
+    "version": "1.0.0"
+}

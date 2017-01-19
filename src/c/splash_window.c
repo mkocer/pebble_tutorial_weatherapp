@@ -17,6 +17,7 @@ void splash_window_load(Window  *window){
     
     splashImageTitle = text_layer_create(GRect(0, 120, 144, 50));
     text_layer_set_text(splashImageTitle, "Weather App");
+    text_layer_set_font(splashImageTitle, fonts_get_system_font(FONT_KEY_GOTHIC_28_BOLD));
     text_layer_set_text_alignment(splashImageTitle, GTextAlignmentCenter);
     layer_add_child(window_layer, text_layer_get_layer(splashImageTitle));
 }

@@ -1,2 +1,3 @@
 .DS_Store
-./Build
+.lock-waf_darwin_build
+build/

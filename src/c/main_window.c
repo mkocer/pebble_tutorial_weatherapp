@@ -1,5 +1,6 @@
 #include <pebble.h>
 #include "main_window.h"
+#include "error_window.h"
 
 
 Window *mainWindow;
@@ -56,7 +57,7 @@ void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuIndex *c
 }
 
 void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *data) {
-	
+    error_window_show("Vybráno menu!");	
 }
 
 void setup_menu_layer(Window *window) {

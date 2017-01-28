@@ -67,7 +67,11 @@ void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *da
         APP_LOG(APP_LOG_LEVEL_ERROR, "ITer is Null! Refusing to send");
         return;
     }
-    dict_write_uint16(iter, MESSAGE_KEY_testkey, 713);
+    //dict_write_uint16(iter, MESSAGE_KEY_testkex, 1);
+    //uint8_t buffer[255];
+    //dict_write_begin(iter, buffer, sizeof(buffer));
+    dict_write_cstring(iter, MESSAGE_KEY_getWeather, "Toronto");
+    dict_write_end(iter); 
     app_message_outbox_send();
 }
 

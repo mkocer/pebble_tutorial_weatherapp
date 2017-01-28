@@ -57,7 +57,18 @@ void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuIndex *c
 }
 
 void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *data) {
-    error_window_show("Vybráno menu!");	
+    error_window_set_error("Vybráno menu!");	
+    error_window_show();	
+    
+    // interaction with JS, getting user defined message key "testkey" defined in settings
+    DictionaryIterator *iter;
+    app_message_outbox_begin(&iter);
+    if (iter == NULL) {
+        APP_LOG(APP_LOG_LEVEL_ERROR, "ITer is Null! Refusing to send");
+        return;
+    }
+    dict_write_uint16(iter, MESSAGE_KEY_testkey, 713);
+    app_message_outbox_send();
 }
 
 void setup_menu_layer(Window *window) {
@@ -78,9 +89,39 @@ void setup_menu_layer(Window *window) {
     layer_add_child(window_layer, menu_layer_get_layer(mainMenuLayer));
 }
 
+// processing tupple from JS
+void process_tuple(Tuple *t){
+    int key = t->key;
+    int value = t->value->int32;
+    APP_LOG(APP_LOG_LEVEL_INFO, "Got key %d with value %d", key, value);
+}
+
+// function run when message from JS was received
+void message_inbox(DictionaryIterator *iter, void *context){
+    Tuple *t = dict_read_first(iter);
+    if(t){
+        process_tuple(t);
+    }
+    while(t != NULL){
+        t = dict_read_next(iter);
+        if(t){
+            process_tuple(t);
+        }
+    }
+}
+
+// function called when messege from JS was dropped
+void message_inbox_dropped(AppMessageResult reason, void *context){
+    APP_LOG(APP_LOG_LEVEL_INFO, "Message dropped, reason %d.", reason);
+}
 
 void main_window_load(Window  *window){
     setup_menu_layer(window);
+   
+    // start interaction with JS side on Phone
+    app_message_register_inbox_received(message_inbox);
+    app_message_register_inbox_dropped(message_inbox_dropped);
+    app_message_open(256, 256);
 }
 
 void main_window_unload(Window  *window){

@@ -5,8 +5,11 @@ Window *errorWindow;
 Layer *errorGraphicLayer;
 char currentErrorText[1][20];
 
-void error_window_show(char *errorText) {
+void error_window_set_error(char *errorText) {
     strncpy(currentErrorText[0], errorText, sizeof(currentErrorText[0]));
+}
+
+void error_window_show() {
     if (errorGraphicLayer) {
         layer_mark_dirty(errorGraphicLayer);
     }
@@ -22,9 +25,14 @@ void error_graphic_proc(Layer *layer, GContext *ctx){
                       GTextAlignmentCenter,
                       NULL
                      );
-    graphics_context_set_stroke_color(ctx, GColorBlack);
+    graphics_context_set_stroke_color(ctx, GColorRed);
     graphics_context_set_stroke_width(ctx, 3);
+    // draw two lines like X
     graphics_draw_line(ctx, GPoint(10,30), GPoint(124, 138));
+    graphics_draw_line(ctx, GPoint(124,30), GPoint(10, 138));
+    // draw filled circle
+    graphics_context_set_fill_color(ctx, GColorBlue);
+    graphics_fill_circle(ctx, GPoint(67,84), 10);
 }
 
 void error_window_load(Window  *window){

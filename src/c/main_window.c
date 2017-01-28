@@ -57,23 +57,37 @@ void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuIndex *c
 }
 
 void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *data) {
-    error_window_set_error("Vybráno menu!");	
-    error_window_show();	
-    
-    // interaction with JS, getting user defined message key "testkey" defined in settings
     DictionaryIterator *iter;
-    app_message_outbox_begin(&iter);
-    if (iter == NULL) {
-        APP_LOG(APP_LOG_LEVEL_ERROR, "ITer is Null! Refusing to send");
-        return;
+    
+    switch(cell_index->section) {
+       case 0:
+           switch(cell_index->row){
+               case 0:
+                  error_window_set_error("Vybráno menu 0!");	
+                  error_window_show();	
+               break;
+           }
+        break;
+        case 1:
+            error_window_set_error("Requesting data");	
+            error_window_show();	
+            // interaction with JS, getting user defined message key "testkey" defined in settings
+            app_message_outbox_begin(&iter);
+            if (iter == NULL) {
+                APP_LOG(APP_LOG_LEVEL_ERROR, "ITer is Null! Refusing to send");
+                return;
+            }
+            //dict_write_uint16(iter, MESSAGE_KEY_testkex, 1);
+            //uint8_t buffer[255];
+            //dict_write_begin(iter, buffer, sizeof(buffer));
+            dict_write_cstring(iter, MESSAGE_KEY_getWeather, "Toronto");
+            dict_write_end(iter); 
+            app_message_outbox_send();
+            vibes_short_pulse();
+            error_window_show();	
+        break;
     }
-    //dict_write_uint16(iter, MESSAGE_KEY_testkex, 1);
-    //uint8_t buffer[255];
-    //dict_write_begin(iter, buffer, sizeof(buffer));
-    dict_write_cstring(iter, MESSAGE_KEY_getWeather, "Toronto");
-    dict_write_end(iter); 
-    app_message_outbox_send();
-}
+}    
 
 void setup_menu_layer(Window *window) {
 	Layer *window_layer = window_get_root_layer(window);
@@ -98,6 +112,9 @@ void process_tuple(Tuple *t){
     int key = t->key;
     int value = t->value->int32;
     APP_LOG(APP_LOG_LEVEL_INFO, "Got key %d with value %d", key, value);
+    char buff[80];
+    snprintf(buff, sizeof(buff), "Got %d", value);
+    error_window_set_error(buff);
 }
 
 // function run when message from JS was received

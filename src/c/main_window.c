@@ -58,35 +58,38 @@ void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuIndex *c
 
 void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *data) {
     DictionaryIterator *iter;
+    char sbuff[80];
     
     switch(cell_index->section) {
        case 0:
            switch(cell_index->row){
                case 0:
-                  error_window_set_error("Vybráno menu 0!");	
+                  error_window_set_error("Záboří");	
                   error_window_show();	
+                  snprintf(sbuff, sizeof(sbuff), "373 84 Zabori Czech Republic");
                break;
            }
         break;
         case 1:
-            error_window_set_error("Requesting data");	
+            error_window_set_error("Toronto");	
             error_window_show();	
-            // interaction with JS, getting user defined message key "testkey" defined in settings
-            app_message_outbox_begin(&iter);
-            if (iter == NULL) {
-                APP_LOG(APP_LOG_LEVEL_ERROR, "ITer is Null! Refusing to send");
-                return;
-            }
-            //dict_write_uint16(iter, MESSAGE_KEY_testkex, 1);
-            //uint8_t buffer[255];
-            //dict_write_begin(iter, buffer, sizeof(buffer));
-            dict_write_cstring(iter, MESSAGE_KEY_getWeather, "Toronto");
-            dict_write_end(iter); 
-            app_message_outbox_send();
-            vibes_short_pulse();
-            error_window_show();	
+            snprintf(sbuff, sizeof(sbuff), "Toronto Canada");
         break;
     }
+    // interaction with JS, getting user defined message key "testkey" defined in settings
+    app_message_outbox_begin(&iter);
+    if (iter == NULL) {
+        APP_LOG(APP_LOG_LEVEL_ERROR, "ITer is Null! Refusing to send");
+        return;
+    }
+    //dict_write_uint16(iter, MESSAGE_KEY_testkex, 1);
+    //uint8_t buffer[255];
+    //dict_write_begin(iter, buffer, sizeof(buffer));
+    dict_write_cstring(iter, MESSAGE_KEY_getWeather, sbuff);
+    dict_write_end(iter); 
+    app_message_outbox_send();
+    vibes_short_pulse();
+    error_window_show();	
 }    
 
 void setup_menu_layer(Window *window) {

@@ -114,10 +114,16 @@ void setup_menu_layer(Window *window) {
 void process_tuple(Tuple *t){
     int key = t->key;
     int value = t->value->int32;
-    APP_LOG(APP_LOG_LEVEL_INFO, "Got key %d with value %d", key, value);
     char buff[80];
-    snprintf(buff, sizeof(buff), "Got %d", value);
-    error_window_set_error(buff);
+    
+    if (t->key == MESSAGE_KEY_sunset) {
+        APP_LOG(APP_LOG_LEVEL_INFO, "Got sunse data with value %s", t->value->cstring);
+        snprintf(buff, sizeof(buff), "%s", t->value->cstring);
+        error_window_set_error(buff);
+    } else {
+        APP_LOG(APP_LOG_LEVEL_INFO, "Got key %d with value %d", key, value);
+        snprintf(buff, sizeof(buff), "Got %d", value);
+    }
 }
 
 // function run when message from JS was received

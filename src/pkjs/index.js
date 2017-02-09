@@ -1,4 +1,7 @@
 var use_celsius = true;
+var lon=15.00;
+var lat=50.00;
+var tz=1; // timezone offset
 
 var CLEAR_DAY = 0;
 var CLEAR_NIGHT = 1;
@@ -66,6 +69,29 @@ var imageId = {
   47 : STORM, //isolated thundershowers
   3200 : NA, //not available
 };
+
+function success(pos) {
+  lon = pos.coords.longitude;
+  lat = pos.coords.latitude;  
+  tz  = new Date().getTimezoneOffset() / (-60.0); // hours
+  console.log('lat= ' + lat + ' lon= ' + lon + ' tz= ' + tz);
+}
+
+function error(err) {
+  console.log('location error (' + err.code + '): ' + err.message);
+}
+
+/* ... */
+
+// Choose options about the data returned
+var options = {
+  enableHighAccuracy: true,
+  maximumAge: 10000,
+  timeout: 10000
+};
+
+// Request current position
+navigator.geolocation.getCurrentPosition(success, error, options);
 
 function getWeatherFromLocation(location_name) {
     var response;
@@ -139,6 +165,61 @@ function getWeatherFromWoeid(woeid) {
     };
     req.send(null);
 }
+
+function getUSNOday() {
+    //                      http://api.usno.navy.mil/rstt/oneday?date=now&coords=41.89N,12.48E&tz=1
+    var url = "http://api.usno.navy.mil/rstt/oneday?date=now&coords=" + lat + "," + lon + "&tz=" + tz;
+    
+    console.log("USNO: " + url);
+
+    var response;
+    var req = new XMLHttpRequest();
+    req.open('GET', url, true);
+    req.onload = function(e) {
+        if (req.readyState == 4) {
+            if (req.status == 200) {
+                //console.log(req.responseText);
+                response = JSON.parse(req.responseText);
+                if(response){
+                    var sunbc="";
+                    var sunec="";
+                    var sunrise="";
+                    var sunset="";
+                    var sunup="";
+                    var sundata= response.sundata; // sundata.length ... delka pole
+                    var moondata= response.moondata;
+                    sundata.forEach( function (myitem)
+                    {
+                         console.log("sun " + myitem.phen + " " + myitem.time);
+                        if (myitem.phen == "BC") sunbc = myitem.time;
+                        if (myitem.phen == "EC") sunec = myitem.time;
+                        if (myitem.phen == "R") sunrise = myitem.time;
+                        if (myitem.phen == "S") sunset = myitem.time;
+                        if (myitem.phen == "U") sunup = myitem.time;
+                    });
+                    moondata.forEach( function (myitem)
+                    {
+                         console.log("moon " + myitem.phen + " " + myitem.time);
+                    });
+                    var message = {
+                        "sunbc" : sunbc,
+                        "sunec" : sunec,
+                        "sunrise" : sunrise,
+                        "sunset" : sunset,
+                        "sunup" : sunup
+                    };
+                    console.log("Sending message through USNO" + JSON.stringify(message));
+                    Pebble.sendAppMessage(message);
+                }
+            } else {
+                console.log("Error getting USNO data: " + e);
+            }
+        }
+    };
+    req.send(null);
+}
+
+
 Pebble.addEventListener("ready", function(e){
   console.log("Ready for interaction!");  
 });
@@ -147,6 +228,7 @@ Pebble.addEventListener("appmessage", function(e){
     console.log("Got message from app: " + e.payload.getWeather);  
     
     getWeatherFromLocation(e.payload.getWeather);
+    getUSNOday();
     /* var object = {
         testkey: 123
     };

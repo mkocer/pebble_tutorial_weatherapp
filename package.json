@@ -4,12 +4,20 @@
     "keywords": [],
     "name": "weather-app",
     "pebble": {
+        "capabilities": [
+            "location"
+        ],
         "displayName": "Weather App",
         "enableMultiJS": true,
         "messageKeys": [
             "icon",
             "temperature",
-            "getWeather"
+            "getWeather",
+            "sunbc",
+            "sunec",
+            "sunrise",
+            "sunset",
+            "sunup"
         ],
         "projectType": "native",
         "resources": {
